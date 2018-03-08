@@ -11,7 +11,7 @@ public interface LoginContract {
 
     interface View extends BaseView<Presenter> {
         public void showLoading();
-        public void startDogsList();
+        public void startDogsList(String token);
     }
 
     interface Presenter extends BasePresenter {

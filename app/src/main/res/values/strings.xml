@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">The Id Dog</string>
+    <string name="app_name">ID Dog</string>
+    <string name="invalid_email">Invalid e-mail</string>
 </resources>
