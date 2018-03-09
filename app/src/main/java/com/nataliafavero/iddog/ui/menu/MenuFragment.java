@@ -1,7 +1,6 @@
 package com.nataliafavero.iddog.ui.menu;
 
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,7 +30,7 @@ public class MenuFragment extends Fragment implements RecyclerViewClickListener 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         RecyclerView rv = new RecyclerView(getActivity());
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rv.setAdapter(new MenuAdapter(dogs, this));
+        rv.setAdapter(new MenuAdapter(dogs, getActivity(), this));
         rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         return rv;
     }

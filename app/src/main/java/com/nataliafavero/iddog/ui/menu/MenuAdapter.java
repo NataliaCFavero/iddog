@@ -1,5 +1,6 @@
 package com.nataliafavero.iddog.ui.menu;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     private String[] dataSource;
     private static RecyclerViewClickListener itemListener;
+    private Context context;
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView textView;
@@ -32,9 +34,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         }
     }
 
-    public MenuAdapter(String[] dataArgs, RecyclerViewClickListener itemListener) {
+    public MenuAdapter(String[] dataArgs, Context context, RecyclerViewClickListener itemListener) {
         dataSource = dataArgs;
         this.itemListener = itemListener;
+        this.context = context;
     }
 
 
@@ -49,6 +52,11 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     @Override
     public void onBindViewHolder(MenuViewHolder holder, int position) {
+        if (position % 2 == 0) {
+            holder.textView.setBackgroundColor(context.getResources().getColor(R.color.colorEven));
+        } else {
+            holder.textView.setBackgroundColor(context.getResources().getColor(R.color.coloOdd));
+        }
         holder.textView.setText(dataSource[position]);
     }
 
