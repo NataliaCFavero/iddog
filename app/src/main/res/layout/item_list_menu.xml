@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:minHeight="70dp"
         android:gravity="center_vertical"
-        android:text="Teste"
         android:padding="10dp"
         android:textSize="26dp"
         android:drawableTint="@android:color/darker_gray"
