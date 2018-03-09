@@ -1,18 +1,31 @@
 package com.nataliafavero.iddog.ui.feed;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.nataliafavero.iddog.R;
 import com.nataliafavero.iddog.ui.menu.RecyclerViewClickListener;
 import com.nataliafavero.iddog.ui.utils.Constants;
 
@@ -29,6 +42,8 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
 
     private FeedContract.Presenter mPresenter;
     private FeedAdapter adapter;
+    private List<Drawable> images;
+    private ProgressDialog progress;
 
     public static FeedFragment newInstance() {
         return new FeedFragment();
@@ -38,13 +53,11 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-        List<Drawable> bitmaps = new ArrayList<>();
-        adapter = new FeedAdapter(bitmaps, this);
+        images = new ArrayList<>();
+        adapter = new FeedAdapter(this);
 
         RecyclerView rv = new RecyclerView(getActivity());
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        rv.setLayoutManager(layoutManager);
+        rv.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         rv.setAdapter(adapter);
         rv.setHasFixedSize(true);
         rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
@@ -55,6 +68,7 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
     @Override
     public void onResume() {
         super.onResume();
+        showLoading();
         mPresenter.start();
         Intent intent = getActivity().getIntent();
         mPresenter.getFeed(intent.getStringExtra(Constants.KEY_TOKEN), intent.getStringExtra(Constants.CATEGORY));
@@ -67,6 +81,12 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
 
     @Override
     public void showLoading() {
+        progress = new ProgressDialog(getActivity());
+        progress.show();
+        progress.setCancelable(false);
+        progress.setIndeterminate(true);
+        progress.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progress.setContentView(R.layout.progress_dialog);
 
     }
 
@@ -77,7 +97,36 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
 
     @Override
     public void recyclerViewListClicked(View v, int position) {
-        System.out.println();
+
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageDrawable(images.get(position));
+
+        Dialog dialog = new Dialog(getContext())
+        {
+            @Override
+            public boolean onTouchEvent(MotionEvent event) {
+                this.dismiss();
+                return true;
+            }
+        };
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        dialog.addContentView(imageView, new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        dialog.getWindow().setAttributes(lp);
+        dialog.show();
+
     }
 
     private class LoadImageTask extends AsyncTask<String, Void, Drawable> {
@@ -86,15 +135,24 @@ public class FeedFragment extends Fragment implements FeedContract.View, Recycle
             String url = urls[0];
             try {
                 InputStream is = (InputStream) new URL(url).getContent();
-                return Drawable.createFromStream(is, "src name");
+                Drawable drawable = Drawable.createFromStream(is, "IDDOG");
+                images.add(drawable);
+                return drawable;
             } catch (Exception e) {
+                e.printStackTrace();
                 return null;
             }
         }
 
         protected void onPostExecute(Drawable result) {
-            adapter.updatePhotos(result);
-            adapter.notifyDataSetChanged();
+            if (result != null) {
+                if(progress!=null && progress.isShowing()) {
+                    progress.hide();
+                }
+                adapter.updatePhotos(result);
+                adapter.notifyDataSetChanged();
+            }
+
         }
     }
 }

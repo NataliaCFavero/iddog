@@ -1,5 +1,6 @@
 package com.nataliafavero.iddog.ui.feed;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import com.nataliafavero.iddog.R;
 import com.nataliafavero.iddog.ui.menu.RecyclerViewClickListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,13 +23,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     private List<Drawable> dataSource;
     private static RecyclerViewClickListener itemListener;
 
-    public FeedAdapter(List<Drawable> images, RecyclerViewClickListener itemListener) {
-        dataSource = images;
+    public FeedAdapter(RecyclerViewClickListener itemListener) {
         this.itemListener = itemListener;
     }
 
-    public void updatePhotos(Drawable image){
+    public void updatePhotos(Drawable image) {
+        if (dataSource == null) {
+            dataSource = new ArrayList<>();
+        }
         dataSource.add(image);
+
     }
 
     public static class FeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -41,7 +46,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         @Override
         public void onClick(View v) {
-            itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
+            itemListener.recyclerViewListClicked(v, this.getAdapterPosition());
         }
     }
 
@@ -57,11 +62,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     @Override
     public void onBindViewHolder(FeedViewHolder holder, int position) {
-        holder.imageView.setImageDrawable(dataSource.get(position));
+        if (dataSource != null) {
+            holder.imageView.setImageDrawable(dataSource.get(position));
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        return dataSource.size();
+        if (dataSource != null) {
+            return dataSource.size();
+        } else {
+            return 0;
+        }
     }
 }

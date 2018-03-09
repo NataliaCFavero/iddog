@@ -2,6 +2,7 @@ package com.nataliafavero.iddog.ui.login;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -71,13 +73,13 @@ public class LoginFragment extends Fragment implements LoginContract.View {
 
     @Override
     public void showLoading() {
+        closeKeyboard();
         progress = new ProgressDialog(getActivity());
+        progress.show();
         progress.setCancelable(false);
         progress.setIndeterminate(true);
         progress.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        //progress.setContentView(R.layout.progress_dialog);
-        progress.getWindow().setGravity(Gravity.CENTER);
-        progress.show();
+        progress.setContentView(R.layout.progress_dialog);
     }
 
     @Override
@@ -100,6 +102,13 @@ public class LoginFragment extends Fragment implements LoginContract.View {
             showLoading();
             mPresenter.doLogin(mInputEmail.getText().toString());
         }
+    }
 
+    private void closeKeyboard() {
+        View view = this.getView();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

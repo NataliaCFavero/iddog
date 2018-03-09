@@ -6,4 +6,5 @@ package com.nataliafavero.iddog.ui.base;
 
 public interface BaseView<T> {
     void setPresenter(T presenter);
+
 }
